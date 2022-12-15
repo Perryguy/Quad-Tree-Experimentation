@@ -1,2 +1,5 @@
 # Quad Tree Experimentation
- A deep dive into the Quad Tree data structure in JavaScript
+ A deep dive into the Quad Tree data structure in JavaScript with Visualisations.
+
+## What is a QuadTree? 
+A quadtree is a tree data structure in which each internal node has up to four children. It is a space-partitioning data structure, which means that it is used to divide a two-dimensional space into rectangles or squares, called "nodes". Each node in a quadtree represents a rectangular area in the two-dimensional space, and each leaf node represents a single point in that space. The advantage of using a quadtree is that it allows for efficient spatial querying, such as searching for points within a given region or checking whether a point is contained within a given region. This makes it a useful data structure for a wide range of applications, such as computer graphics, image processing, and geographical information systems.
