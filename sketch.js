@@ -24,4 +24,15 @@ function draw() {
     }
     background(0);
     quadTree.show();
+
+    stroke(0, 255, 0);
+    rectMode(CENTER);
+    let range = new Rectangle(250,250, 107,77)
+    rect(range.x, range.y, range.w *2, range.h *2)
+
+    let points = quadTree.query(range);
+    for (let p of points){
+      strokeWeight(4);
+      point(p.x, p.y);
+    }
 }

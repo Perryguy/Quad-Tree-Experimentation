@@ -24,12 +24,13 @@ class Rectangle {
   }
 
   intersects(range) {
-    // Do these two rectangles overlap? Returns conditions are true they don't interect. This is why it is negated! 
+    // Do these two rectangles overlap? Returns conditions are true they don't interect. This is why it is negated!
     return !(
       range.x - range.w > this.x + this.w ||
       range.x + range.w < this.x - this.w ||
       range.y - range.h > this.y + this.h ||
-      range.y + range.h < this.y - this.h);
+      range.y + range.h < this.y - this.h
+    );
   }
 }
 
@@ -92,9 +93,28 @@ class QuadTree {
     }
   }
 
-  query(range) {
+  query(range, pointsFound) {
+    if (!pointsFound){
+        pointsFound = [];
+    }
+
     if (!this.boundary.intersects(range)) {
-      return;
+      // Returns empty array.
+      return pointsFound;
+    } else {
+      for (let point of this.points) {
+        if (range.contains(point)) {
+            pointsFound.push(point);
+        }  
+      }
+
+      if (this.hasDivided){
+        this.northWest.query(range, pointsFound);
+        this.northEast.query(range, pointsFound);
+        this.southWest.query(range, pointsFound);
+        this.southEast.query(range, pointsFound);
+      }
+      return pointsFound;
     }
   }
 
@@ -119,5 +139,6 @@ class QuadTree {
       strokeWeight(4);
       point(p.x, p.y);
     }
+
   }
 }
