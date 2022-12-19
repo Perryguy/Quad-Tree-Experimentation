@@ -1,13 +1,13 @@
-let particles = [];
 let quadTree;
 
 function setup() {
   createCanvas(500, 500);
+  background(0);
   for (let i = 0; i < 100; i++) {
     particles[i] = new Particle(random(width), random(height), random(10), random(10));
   }
-  background(0);
 }
+
 
 function draw() {
   background(0);

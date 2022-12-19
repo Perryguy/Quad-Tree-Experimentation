@@ -6,47 +6,81 @@ class Point {
   }
 }
 
-class Circle {
-    constructor(x, y, r) {
-      this.x = x;
-      this.y = y;
-      this.r = r;
-      this.rSquared = this.r * this.r;
-    }
-  
-    contains(point) {
-      // check if the point is in the circle by checking if the euclidean distance of
-      // the point and the center of the circle if smaller or equal to the radius of
-      // the circle
-      let d = Math.pow((point.x - this.x), 2) + Math.pow((point.y - this.y), 2);
-      return (d <= this.rSquared);
-    }
-  
-    intersects(range) {
-  
-      var xDist = Math.abs(range.x - this.x);
-      var yDist = Math.abs(range.y - this.y);
-  
-      // radius of the circle
-      var r = this.r;
-  
-      var w = range.w;
-      var h = range.h;
-  
-      var edges = Math.pow((xDist - w), 2) + Math.pow((yDist - h), 2);
-  
-      // no intersection
-      if (xDist > (r + w) || yDist > (r + h))
-        return false;
-  
-      // intersection within the circle
-      if (xDist <= w || yDist <= h)
-        return true;
-  
-      // intersection on the edge of the circle
-      return edges <= this.rSquared;
-    }
+class Polygon {
+  // POLYGON/POINT
+  constructor(x, y, userData) {
+    this.x = x;
+    this.y = y;
+    this.userData = userData;
   }
+  polyPoint(vertices, px, py) {
+    let collision = false;
+
+    // go through each of the vertices, plus
+    // the next vertex in the list
+    let next = 0;
+    for (let current = 0; current < vertices.length; current++) {
+      // get next vertex in list
+      // if we've hit the end, wrap around to 0
+      next = current + 1;
+      if (next == vertices.length) next = 0;
+
+      // get the PVectors at our current position
+      // this makes our if statement a little cleaner
+      let vc = vertices[current]; // c for "current"
+      let vn = vertices[next]; // n for "next"
+
+      // compare position, flip 'collision' variable
+      // back and forth
+      if (
+        ((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) &&
+        px < ((vn.x - vc.x) * (py - vc.y)) / (vn.y - vc.y) + vc.x
+      ) {
+        collision = !collision;
+      }
+    }
+    return collision;
+  }
+}
+
+class Circle {
+  constructor(x, y, r) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.rSquared = this.r * this.r;
+  }
+
+  contains(point) {
+    // check if the point is in the circle by checking if the euclidean distance of
+    // the point and the center of the circle if smaller or equal to the radius of
+    // the circle
+    let d = Math.pow(point.x - this.x, 2) + Math.pow(point.y - this.y, 2);
+    return d <= this.rSquared;
+  }
+
+  intersects(range) {
+    var xDist = Math.abs(range.x - this.x);
+    var yDist = Math.abs(range.y - this.y);
+
+    // radius of the circle
+    var r = this.r;
+
+    var w = range.w;
+    var h = range.h;
+
+    var edges = Math.pow(xDist - w, 2) + Math.pow(yDist - h, 2);
+
+    // no intersection
+    if (xDist > r + w || yDist > r + h) return false;
+
+    // intersection within the circle
+    if (xDist <= w || yDist <= h) return true;
+
+    // intersection on the edge of the circle
+    return edges <= this.rSquared;
+  }
+}
 
 class Rectangle {
   constructor(x, y, w, h) {
@@ -110,6 +144,7 @@ class QuadTree {
     if (!this.boundary.contains(point)) {
       return false;
     }
+
     if (this.points.length < this.capacity) {
       this.points.push(point);
       return true;
@@ -163,7 +198,7 @@ class QuadTree {
 
   show() {
     stroke(255);
-    strokeWeight(1);
+    strokeWeight(2);
     noFill();
     rectMode(CENTER);
     rect(

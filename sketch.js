@@ -1,58 +1,67 @@
 let quadTree;
+let asteroids = [];
+let lasers = [];
+let ship;
+
 function setup() {
-  createCanvas(1920, 1080);
-
-  //Rectange x&y refer to the rects center point and the width and height (w&h) are half lengths from the center point.
-  let boundary = new Rectangle(1920, 1080, 1920, 1080);
-  quadTree = new QuadTree(boundary, 4);
-  console.log(quadTree);
-
-  for (let i = 0; i < 500; i++) {
-    let point = new Point(
-      randomGaussian(width / 2, width / 8),
-      randomGaussian(height / 2, height / 8)
-    );
-    quadTree.insert(point);
-  }
-
-  // Visualise
+  createCanvas(windowWidth, windowHeight);
   background(0);
-  quadTree.show();
 
-  stroke(0, 255, 0);
-  rectMode(CENTER);
-  let range = new Rectangle(
-    random(width),
-    random(height),
-    random(100),
-    random(100)
-  );
-  rect(range.x, range.y, range.w * 2, range.h * 2);
+  ship = new Ship();
 
-  let points = quadTree.query(range);
-  console.log(points.length);
-  for (let p of points) {
-    strokeWeight(4);
-    point(p.x, p.y);
+  for (var i = 0; i < 10; i++){
+  asteroids.push(new Asteroid);
+  }
+}
+
+//Controls
+function keyPressed() {
+  if (keyCode == RIGHT_ARROW) {
+    ship.setRotation(0.1);
+  } else if (keyCode == LEFT_ARROW) {
+    ship.setRotation(-0.1);
+  } else if (keyCode == UP_ARROW) {
+    ship.Thrusting(true);
+  }
+}
+
+function keyReleased() {
+  if (keyCode == RIGHT_ARROW) {
+    ship.setRotation(0);
+  } else if (keyCode == LEFT_ARROW) {
+    ship.setRotation(0);
+  } else if (keyCode == UP_ARROW) {
+    ship.Thrusting(false);
+  } else if (keyCode == 32){
+    //spacebar
+    lasers.push(new Laser(ship.position, ship.heading, ship.r))
   }
 }
 
 function draw() {
-  if (mouseIsPressed) {
-    let mousePositionPoint = new Point(mouseX, mouseY);
-    quadTree.insert(mousePositionPoint);
-  }
   background(0);
+
+  let boundary = new Rectangle(windowWidth/2, windowHeight/2, windowWidth/2, windowHeight/2);
+  quadTree = new QuadTree(boundary, 2);
+  
+  for (var i = 0; i < asteroids.length; i++){
+    asteroids[i].render();
+    asteroids[i].update();
+    asteroids[i].edges();
+    let point = new Point(asteroids[i].position.x, asteroids[i].position.y, asteroids[i]);
+    quadTree.insert(point);
+  }
+  console.log(quadTree)
   quadTree.show();
 
-  stroke(0, 255, 0);
-  rectMode(CENTER);
-  let range = new Rectangle(mouseX, mouseY, 100, 100);
-  rect(range.x, range.y, range.w * 2, range.h * 2);
 
-  let points = quadTree.query(range);
-  for (let p of points) {
-    strokeWeight(4);
-    point(p.x, p.y);
+  for (var i = 0; i < lasers.length; i++){
+    lasers[i].render();
+    lasers[i].update();
   }
+
+  ship.render();
+  ship.turn();
+  ship.update();
+  ship.edges();
 }
