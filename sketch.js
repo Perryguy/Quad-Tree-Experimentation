@@ -1,7 +1,7 @@
-let quadTree;
 let asteroids = [];
 let lasers = [];
 let ship;
+let score = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -9,8 +9,8 @@ function setup() {
 
   ship = new Ship();
 
-  for (var i = 0; i < 10; i++){
-  asteroids.push(new Asteroid);
+  for (var i = 0; i < 10; i++) {
+    asteroids.push(new Asteroid());
   }
 }
 
@@ -32,32 +32,52 @@ function keyReleased() {
     ship.setRotation(0);
   } else if (keyCode == UP_ARROW) {
     ship.Thrusting(false);
-  } else if (keyCode == 32){
+  } else if (keyCode == 32) {
     //spacebar
-    lasers.push(new Laser(ship.position, ship.heading, ship.r))
+    lasers.push(new Laser(ship.position, ship.heading, ship.r));
   }
 }
 
 function draw() {
   background(0);
+  noStroke();
+  fill(255);
+  textSize(40);
+  text(score, width / 2, 50);
 
-  let boundary = new Rectangle(windowWidth/2, windowHeight/2, windowWidth/2, windowHeight/2);
-  quadTree = new QuadTree(boundary, 2);
-  
-  for (var i = 0; i < asteroids.length; i++){
+  for (var i = 0; i < asteroids.length; i++) {
+    if (ship.hits(asteroids[i])) {
+      console.log("shit..");
+      //find a better place for the score
+      score = 0;
+    }
     asteroids[i].render();
     asteroids[i].update();
     asteroids[i].edges();
-    let point = new Point(asteroids[i].position.x, asteroids[i].position.y, asteroids[i]);
-    quadTree.insert(point);
   }
-  console.log(quadTree)
-  quadTree.show();
 
-
-  for (var i = 0; i < lasers.length; i++){
+  for (let i = lasers.length - 1; i >= 0; i--) {
     lasers[i].render();
     lasers[i].update();
+
+    if (lasers[i].offScreen()) {
+      lasers.splice(i, 1);
+    } else {
+      for (let j = asteroids.length - 1; j >= 0; j--) {
+        if (lasers[i].hit(asteroids[j])) {
+          //find a better place for the score.
+          score += 1;
+
+          if (asteroids[j].r > 25) {
+            let newAsteroids = asteroids[j].breakUp();
+            asteroids.push.apply(asteroids, newAsteroids);
+          }
+          asteroids.splice(j, 1);
+          lasers.splice(i, 1);
+          break;
+        }
+      }
+    }
   }
 
   ship.render();

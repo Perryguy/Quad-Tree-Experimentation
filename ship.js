@@ -16,6 +16,16 @@ class Ship {
     this.velocity.mult(0.98);
   }
 
+  // rough collison detection
+  hits(asteroid){
+    var distance = dist(this.position.x, this.position.y, asteroid.position.x, asteroid.position.y)
+    if ( distance < this.r + asteroid.r){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   render() {
     // push and pop are p5 functions to stop translation a style based shenanigans. Ref: https://p5js.org/reference/#/p5/push 
     push();

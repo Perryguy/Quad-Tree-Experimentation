@@ -1,7 +1,11 @@
 class Asteroid {
-  constructor() {
+  constructor(position, r) {
+    if (position){
+    this.position = position.copy();
+    } else{
     this.position = createVector(random(width), random(height));
-    this.r = random(15, 50);
+    }
+    this.r = r ?? random(30, 50);
     this.vertices = floor(random(5, 15));
     this.velocity = p5.Vector.random2D();
     this.offset = [];
@@ -23,7 +27,7 @@ class Asteroid {
   
   initOffsets(){
     for(let i = 0; i <= this.vertices; i++){
-        this.offset[i] = random(-15,15);
+        this.offset[i] = random(-this.r *0.5, this.r *0.5);
     }
   }
 
@@ -37,6 +41,13 @@ class Asteroid {
         vertex(x, y)
     }
     endShape(CLOSE)
+  }
+
+  breakUp(){
+    let newAsteroids = [];
+    newAsteroids[0] = new Asteroid(this.position, this.r * random(0.5,1));
+    newAsteroids[1] = new Asteroid(this.position, this.r * random(0.5, 1));
+    return newAsteroids;
   }
 
   //DRY might need refactoring later
